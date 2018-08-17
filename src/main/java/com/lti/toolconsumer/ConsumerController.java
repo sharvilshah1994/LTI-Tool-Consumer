@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +46,9 @@ public class ConsumerController {
         paramsMap.put("resource_link_id", "value");
         paramsMap.put("tool_consumer_info_product_family_code", "abc");
         paramsMap.put("tool_consumer_info_version", "1.0");
+        if (ParamConfig.GET_GRADES_FROM_TOOL) {
+            paramsMap.put("lis_outcome_service_url", ParamConfig.TOOL_CONSUMER_URL);
+        }
         paramsMap.put("oauth_nonce", oauthConfig.getNonce());
         paramsMap.put("oauth_timestamp", String.valueOf(oauthConfig.getTimestamp()));
         paramsMap.put("oauth_signature", oauthConfig.getOAuthSignature(paramsMap, oauthConsumerKey, secret,
@@ -51,5 +56,13 @@ public class ConsumerController {
         paramsMap.put("secret", secret);
         model.addAllAttributes(paramsMap);
         return "home";
+    }
+
+    @PostMapping("/")
+    public String getGradesFromTool(HttpServletRequest request,
+                                    Model model) {
+        String lisResultSourcedid = request.getParameter("lis_result_score");
+        model.addAttribute("result", lisResultSourcedid);
+        return "grade";
     }
 }
